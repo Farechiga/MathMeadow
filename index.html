@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Meadow: Doubles & Near Doubles</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+      background: linear-gradient(135deg, #b4e197, #7bc47f);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .counter {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 1.2rem;
+    }
+    .math-box {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .answer-input {
+      font-size: 2rem;
+      padding: 0.5rem;
+      text-align: center;
+      width: 100px;
+      border-radius: 10px;
+      border: none;
+    }
+    video {
+      margin-top: 20px;
+      max-width: 400px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="counter">
+    <div>Session Score: <span id="sessionScore">0</span></div>
+    <div>Lifetime Score: <span id="lifetimeScore">0</span></div>
+  </div>
+
+  <div class="math-box" id="problem"></div>
+  <input type="number" class="answer-input" id="answer" placeholder="?" autofocus />
+
+  <video id="animation" autoplay muted loop playsinline></video>
+
+  <script>
+    const problems = [
+      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10],
+      [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [50, 51], [100, 101], [101, 102]
+    ];
+
+    const animations = [
+      "Sugarplum bucking.mp4",
+      "Sugarplum cheeky.mp4",
+      "Sugarplum doing leg kicks.mp4",
+      "Sugarplum romping.mp4",
+      "Sugarplum turning.mp4"
+    ];
+
+    const animationBasePath = "/assets/animal-animations/";
+
+    let sessionScore = 0;
+    let currentProblem;
+
+    const sessionScoreEl = document.getElementById("sessionScore");
+    const lifetimeScoreEl = document.getElementById("lifetimeScore");
+    const problemEl = document.getElementById("problem");
+    const answerEl = document.getElementById("answer");
+    const animationEl = document.getElementById("animation");
+
+    function loadLifetimeScore() {
+      return parseInt(localStorage.getItem("lifetimeScore") || "0", 10);
+    }
+
+    function saveLifetimeScore(score) {
+      localStorage.setItem("lifetimeScore", score);
+    }
+
+    function getRandomProblem() {
+      return problems[Math.floor(Math.random() * problems.length)];
+    }
+
+    function getRandomAnimation() {
+      const file = animations[Math.floor(Math.random() * animations.length)];
+      return animationBasePath + file;
+    }
+
+    function showProblem() {
+      currentProblem = getRandomProblem();
+      problemEl.textContent = `${currentProblem[0]} + ${currentProblem[1]} =`;
+      answerEl.value = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(answerEl.value);
+      const correct = currentProblem[0] + currentProblem[1];
+      if (userAnswer === correct) {
+        sessionScore++;
+        sessionScoreEl.textContent = sessionScore;
+        const lifetimeScore = loadLifetimeScore() + 1;
+        saveLifetimeScore(lifetimeScore);
+        lifetimeScoreEl.textContent = lifetimeScore;
+
+        // Play animation
+        animationEl.src = getRandomAnimation();
+      }
+      showProblem();
+    }
+
+    answerEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    // Init
+    lifetimeScoreEl.textContent = loadLifetimeScore();
+    showProblem();
+  </script>
+</body>
+</html>
