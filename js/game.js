@@ -28,28 +28,6 @@ const lifetimeScoreEl = document.getElementById("lifetimeScore");
 const problemEl = document.getElementById("problem");
 const answerEl = document.getElementById("answer");
 const animationEl = document.getElementById("animation");
-const confettiCanvas = document.getElementById("confetti");
-const confettiCtx = confettiCanvas.getContext("2d");
-
-function resizeCanvas() {
-  confettiCanvas.width = window.innerWidth;
-  confettiCanvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-function launchConfetti() {
-  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  for (let i = 0; i < 150; i++) {
-    const x = Math.random() * confettiCanvas.width;
-    const y = Math.random() * confettiCanvas.height / 2;
-    const size = Math.random() * 8 + 2;
-    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    confettiCtx.fillStyle = color;
-    confettiCtx.fillRect(x, y, size, size);
-  }
-  setTimeout(() => confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height), 1000);
-}
 
 function shuffleProblems() {
   problems = [];
@@ -96,15 +74,15 @@ function checkAnswer() {
     lifetimeScore++;
     localStorage.setItem("lifetimeScore", lifetimeScore);
     lifetimeScoreEl.textContent = lifetimeScore;
-    launchConfetti();
     animationEl.src = getRandomAnimation();
+    animationEl.load();
     animationEl.style.display = "block";
   } else {
     streak = 0;
   }
 
   currentProblemIndex++;
-  setTimeout(showProblem, 1500);
+  setTimeout(showProblem, 2000);
 }
 
 answerEl.addEventListener("keydown", (e) => {
