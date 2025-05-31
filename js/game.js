@@ -1,6 +1,7 @@
 // game.js
 
 const mode = "doubles";
+const mode = "doubles";
 const modeTimers = { doubles: 6000 };
 
 const doubles = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]];
@@ -74,8 +75,11 @@ function checkAnswer() {
     lifetimeScore++;
     localStorage.setItem("lifetimeScore", lifetimeScore);
     lifetimeScoreEl.textContent = lifetimeScore;
-    animationEl.src = getRandomAnimation();
+    const animationSrc = getRandomAnimation();
+    console.log("Loading animation:", animationSrc);
+    animationEl.src = animationSrc;
     animationEl.load();
+    animationEl.play().catch(err => console.warn("Autoplay failed:", err));
     animationEl.style.display = "block";
   } else {
     streak = 0;
