@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  text-align: center;
+  background: linear-gradient(135deg, #b4e197, #7bc47f);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.counter {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 1.2rem;
+}
+.math-box {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+.answer-input {
+  font-size: 2rem;
+  padding: 0.5rem;
+  text-align: center;
+  width: 100px;
+  border-radius: 10px;
+  border: none;
+}
+video {
+  margin-top: 20px;
+  max-width: 400px;
+  border-radius: 12px;
+}
