@@ -40,7 +40,7 @@ function shuffleProblems() {
 
 function getRandomAnimation() {
   const file = animations[Math.floor(Math.random() * animations.length)];
-  return animationBasePath + file;
+  return animationBasePath + encodeURIComponent(file);
 }
 
 function triggerStreakEffect(streak) {
