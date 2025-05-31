@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Meadow: Doubles & Near Doubles</title>
+  <title>Math Meadow: Doubles Game</title>
   <style>
     body {
       margin: 0;
@@ -24,8 +24,8 @@
       font-size: 1.2rem;
     }
     .math-box {
-      font-size: 3rem;
-      margin-bottom: 20px;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
     }
     .answer-input {
       font-size: 2rem;
@@ -54,10 +54,15 @@
   <video id="animation" autoplay muted loop playsinline></video>
 
   <script>
-    const problems = [
-      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10],
-      [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [50, 51], [100, 101], [101, 102]
-    ];
+    const mode = "doubles"; // Expandable in the future
+    const modeTimers = {
+      doubles: 6000,
+      make10: 8000,
+      wordProblems: 15000
+    };
+
+    const doubles = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]];
+    const nearDoubles = [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11]];
 
     const animations = [
       "Sugarplum bucking.mp4",
@@ -70,7 +75,11 @@
     const animationBasePath = "/assets/animal-animations/";
 
     let sessionScore = 0;
-    let currentProblem;
+    let lifetimeScore = parseInt(localStorage.getItem("lifetimeScore") || "0", 10);
+    let problems = [];
+    let currentProblemIndex = 0;
+    let streak = 0;
+    let startTime = 0;
 
     const sessionScoreEl = document.getElementById("sessionScore");
     const lifetimeScoreEl = document.getElementById("lifetimeScore");
@@ -78,16 +87,13 @@
     const answerEl = document.getElementById("answer");
     const animationEl = document.getElementById("animation");
 
-    function loadLifetimeScore() {
-      return parseInt(localStorage.getItem("lifetimeScore") || "0", 10);
-    }
-
-    function saveLifetimeScore(score) {
-      localStorage.setItem("lifetimeScore", score);
-    }
-
-    function getRandomProblem() {
-      return problems[Math.floor(Math.random() * problems.length)];
+    function shuffleProblems() {
+      problems = [];
+      for (let i = 0; i < doubles.length; i++) {
+        problems.push(doubles[i], nearDoubles[i]);
+      }
+      problems = problems.sort(() => Math.random() - 0.5);
+      currentProblemIndex = 0;
     }
 
     function getRandomAnimation() {
@@ -95,25 +101,42 @@
       return animationBasePath + file;
     }
 
+    function triggerStreakEffect(streak) {
+      if ([3, 5, 10].includes(streak)) {
+        console.log(`Streak bonus: ${streak} correct in a row!`);
+        // Insert rainbow trail or other effect trigger here
+      }
+    }
+
     function showProblem() {
-      currentProblem = getRandomProblem();
-      problemEl.textContent = `${currentProblem[0]} + ${currentProblem[1]} =`;
+      if (currentProblemIndex >= problems.length) shuffleProblems();
+      const pair = problems[currentProblemIndex];
+      problemEl.textContent = `${pair[0]} + ${pair[1]} =`;
       answerEl.value = "";
+      answerEl.focus();
+      startTime = Date.now();
     }
 
     function checkAnswer() {
       const userAnswer = parseInt(answerEl.value);
-      const correct = currentProblem[0] + currentProblem[1];
-      if (userAnswer === correct) {
-        sessionScore++;
-        sessionScoreEl.textContent = sessionScore;
-        const lifetimeScore = loadLifetimeScore() + 1;
-        saveLifetimeScore(lifetimeScore);
-        lifetimeScoreEl.textContent = lifetimeScore;
+      const pair = problems[currentProblemIndex];
+      const correct = pair[0] + pair[1];
+      const timeTaken = Date.now() - startTime;
 
-        // Play animation
+      if (userAnswer === correct && timeTaken <= modeTimers[mode]) {
+        sessionScore++;
+        streak++;
+        triggerStreakEffect(streak);
+        sessionScoreEl.textContent = sessionScore;
+        lifetimeScore++;
+        localStorage.setItem("lifetimeScore", lifetimeScore);
+        lifetimeScoreEl.textContent = lifetimeScore;
         animationEl.src = getRandomAnimation();
+      } else {
+        streak = 0;
       }
+
+      currentProblemIndex++;
       showProblem();
     }
 
@@ -123,8 +146,8 @@
       }
     });
 
-    // Init
-    lifetimeScoreEl.textContent = loadLifetimeScore();
+    lifetimeScoreEl.textContent = lifetimeScore;
+    shuffleProblems();
     showProblem();
   </script>
 </body>
