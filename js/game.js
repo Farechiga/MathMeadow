@@ -1,9 +1,7 @@
-const mode = "doubles"; // Expandable
-const modeTimers = {
-  doubles: 6000,
-  make10: 8000,
-  wordProblems: 15000
-};
+// game.js
+
+const mode = "doubles";
+const modeTimers = { doubles: 6000 };
 
 const doubles = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]];
 const nearDoubles = [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11]];
@@ -30,6 +28,28 @@ const lifetimeScoreEl = document.getElementById("lifetimeScore");
 const problemEl = document.getElementById("problem");
 const answerEl = document.getElementById("answer");
 const animationEl = document.getElementById("animation");
+const confettiCanvas = document.getElementById("confetti");
+const confettiCtx = confettiCanvas.getContext("2d");
+
+function resizeCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function launchConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  for (let i = 0; i < 150; i++) {
+    const x = Math.random() * confettiCanvas.width;
+    const y = Math.random() * confettiCanvas.height / 2;
+    const size = Math.random() * 8 + 2;
+    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    confettiCtx.fillStyle = color;
+    confettiCtx.fillRect(x, y, size, size);
+  }
+  setTimeout(() => confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height), 1000);
+}
 
 function shuffleProblems() {
   problems = [];
@@ -48,7 +68,7 @@ function getRandomAnimation() {
 function triggerStreakEffect(streak) {
   if ([3, 5, 10].includes(streak)) {
     console.log(`Streak bonus: ${streak} correct in a row!`);
-    // Insert visual overlay or jingle trigger here
+    // Add streak effect here
   }
 }
 
@@ -58,6 +78,7 @@ function showProblem() {
   problemEl.textContent = `${pair[0]} + ${pair[1]} =`;
   answerEl.value = "";
   answerEl.focus();
+  animationEl.style.display = "none";
   startTime = Date.now();
 }
 
@@ -75,13 +96,15 @@ function checkAnswer() {
     lifetimeScore++;
     localStorage.setItem("lifetimeScore", lifetimeScore);
     lifetimeScoreEl.textContent = lifetimeScore;
+    launchConfetti();
     animationEl.src = getRandomAnimation();
+    animationEl.style.display = "block";
   } else {
     streak = 0;
   }
 
   currentProblemIndex++;
-  showProblem();
+  setTimeout(showProblem, 1500);
 }
 
 answerEl.addEventListener("keydown", (e) => {
